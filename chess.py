@@ -29,7 +29,7 @@ def read_fen(fen):
     for i, row in enumerate(rows):
         new_row = ""
         for c in row:
-            if c in "12345678":
+            if c in "123456789":
                 new_row += " " * int(c)
             else:
                 new_row += c
