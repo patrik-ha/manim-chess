@@ -1,41 +1,31 @@
 from manim import *
 
 def piece_to_icon(c, fill=True):
-    color = RED if c.isupper() else BLACK
-    prefix = r"\Black" if c.isupper() else r"\Black"
+    prefix = "w" if c.isupper() else "b"
     prefix = prefix if not c.isspace() else ""
-    lookup = {
-        'k': "King",
-        'q': "Queen",
-        'r': "Rook",
-        'b': "Bishop",
-        'n': "Knight",
-        'p': "Pawn",
-        ' ': ""
+    icon = SVGMobject("pieces/{}.svg".format(prefix + c.upper()), should_center=False)
+    scalings = {
+        'p': 0.35,
+        'r': 0.35,
+        'k': 0.40,
+        'n': 0.38,
+        'b': 0.38,
+        'q': 0.38
     }
+    icon.set_x(0)
+    icon.set_y(0)
+    icon.scale(scalings[c.lower()])
+    if c.lower() == "k":
+        icon.shift(UP * 0.035)
+    return icon
 
-    suffix = "OnWhite" if c.isupper() else "OnWhite"
-    suffix = suffix if not c.isspace() else ""
-
-    template = TexTemplate()
-    template.add_to_preamble(r"\usepackage{skak}")
-    tex = Tex(
-        prefix + lookup[c.lower()] + suffix,
-        tex_template=template,
-        color=color,
-    )
-
-    tex.set_fill(color)
-    tex.scale(1)
-    return tex
-
-def clean_fen(fen):
-    # Only care about the position
-    # Also assume that the fen is valid or whatever
+def read_fen(fen):
     if " " in fen:
         fen = fen.split(" ")[0]
     
     rows = fen.split("/")
+
+    dims = (len(rows), max([len(row) for row in rows]))
 
     for i, row in enumerate(rows):
         new_row = ""
@@ -45,24 +35,24 @@ def clean_fen(fen):
             else:
                 new_row += c
         rows[i] = new_row
-    print(rows)
-    return rows
+    return rows, dims
 
 
-def get_board(dims, fen):
-    fen = clean_fen(fen)
+def get_board(fen):
+    fen, dims = read_fen(fen)
     template = TexTemplate()
     template.add_to_preamble(r"\usepackage{skak}")
     board = []
     for i in range(dims[0]):
         for j in range(dims[1]):
-            color = WHITE if ((i + j) % 2) == 0 else BLUE
-            square = Square(1, stroke_color=BLACK, stroke_width=DEFAULT_STROKE_WIDTH * 0.3)
+            color = "#B58863" if ((i + j + 1) % 2) == 0 else "#F0D9B5"
+            square = Square(0.999, stroke_color=BLACK, stroke_width=0)
             square.set_fill(color, 1)
-            icon = piece_to_icon(fen[i][j])
-            full_square = Group(square, icon)
-            full_square.shift(i * DOWN + j * RIGHT)
-            board.append(full_square)
+            if not fen[i][j].isspace():
+                icon = piece_to_icon(fen[i][j])
+                square = Group(square, icon)
+            square.shift(i * DOWN + j * RIGHT)
+            board.append(square)
     board = Group(*board)
     board.set_x(0)
     board.set_y(0)
