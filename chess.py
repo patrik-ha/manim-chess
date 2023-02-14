@@ -25,7 +25,6 @@ def read_fen(fen):
     
     rows = fen.split("/")
 
-    dims = (len(rows), max([len(row) for row in rows]))
 
     for i, row in enumerate(rows):
         new_row = ""
@@ -35,6 +34,7 @@ def read_fen(fen):
             else:
                 new_row += c
         rows[i] = new_row
+    dims = (len(rows), max([len(row) for row in rows]))
     return rows, dims
 
 
