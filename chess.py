@@ -1,9 +1,12 @@
 from manim import *
+import os
 
 def piece_to_icon(c, fill=True):
     prefix = "w" if c.isupper() else "b"
     prefix = prefix if not c.isspace() else ""
-    icon = SVGMobject("pieces/{}.svg".format(prefix + c.upper()), should_center=False)
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    piece_path = os.path.join(dir_path, "pieces/{}.svg".format(prefix + c.upper()))
+    icon = SVGMobject(piece_path, should_center=False)
     scalings = {
         'p': 0.35,
         'r': 0.35,
@@ -38,7 +41,9 @@ def read_fen(fen):
     return rows, dims
 
 
-def get_board(fen):
+def get_board(fen, arrows=None):
+    if arrows is None:
+        arrows = []
     fen, dims = read_fen(fen)
     template = TexTemplate()
     template.add_to_preamble(r"\usepackage{skak}")
@@ -53,7 +58,17 @@ def get_board(fen):
                 square = Group(square, icon)
             square.shift(i * DOWN + j * RIGHT)
             board.append(square)
-    board = Group(*board)
+    
+    arrows_to_add = []
+    for arrow in arrows:
+        i, j, dx, dy = arrow
+        graphical_arrow = Arrow((DOWN * i + RIGHT * j), (DOWN * (i + dx) + RIGHT * (j + dy)), color=BLUE, stroke_width=25, max_stroke_width_to_length_ratio=10, max_tip_length_to_length_ratio=0.5)
+        circle = Circle(0.45, stroke_width=DEFAULT_STROKE_WIDTH*2).shift((DOWN * (i + dx) + RIGHT * (j + dy)))
+        group = Group(circle, graphical_arrow)
+        arrows_to_add.append(group)
+        
+    
+    board = Group(*board, *arrows_to_add)
     board.set_x(0)
     board.set_y(0)
     return board
