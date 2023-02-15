@@ -45,8 +45,6 @@ def get_board(fen, arrows=None):
     if arrows is None:
         arrows = []
     fen, dims = read_fen(fen)
-    template = TexTemplate()
-    template.add_to_preamble(r"\usepackage{skak}")
     board = []
     for i in range(dims[0]):
         for j in range(dims[1]):
