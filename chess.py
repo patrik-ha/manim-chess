@@ -41,10 +41,12 @@ def read_fen(fen):
     return rows, dims
 
 
-def get_board(fen, arrows=None):
+def get_board(fen, arrows=None, piece_opacities=None):
     if arrows is None:
         arrows = []
     fen, dims = read_fen(fen)
+    if piece_opacities is None:
+        piece_opacities = np.ones(dims, dtype=np.float32)
     board = []
     for i in range(dims[0]):
         for j in range(dims[1]):
@@ -53,6 +55,7 @@ def get_board(fen, arrows=None):
             square.set_fill(color, 1)
             if not fen[i][j].isspace():
                 icon = piece_to_icon(fen[i][j])
+                icon.fade((1 - piece_opacities[i, j]))
                 square = Group(square, icon)
             square.shift(i * DOWN + j * RIGHT)
             board.append(square)
