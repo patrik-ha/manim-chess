@@ -5,19 +5,11 @@ def piece_to_icon(c, fill=True):
     prefix = "w" if c.isupper() else "b"
     prefix = prefix if not c.isspace() else ""
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    piece_path = os.path.join(dir_path, "pieces/{}.svg".format(prefix + c.upper()))
-    icon = SVGMobject(piece_path, should_center=False)
-    scalings = {
-        'p': 0.35,
-        'r': 0.35,
-        'k': 0.40,
-        'n': 0.38,
-        'b': 0.38,
-        'q': 0.38
-    }
+    piece_path = os.path.join(dir_path, "png_pieces/{}.png".format(prefix + c.upper()))
+    icon = ImageMobject(piece_path)
     icon.set_x(0)
     icon.set_y(0)
-    icon.scale(scalings[c.lower()])
+    icon.scale(0.27)
     if c.lower() == "k":
         icon.shift(UP * 0.035)
     return icon
@@ -55,7 +47,9 @@ def get_board(fen, arrows=None, piece_opacities=None):
             square.set_fill(color, 1)
             if not fen[i][j].isspace():
                 icon = piece_to_icon(fen[i][j])
-                icon.fade((1 - piece_opacities[i, j]))
+                alpha = piece_opacities[i, j]
+                alpha_mask = np.copy(icon.pixel_array[:, :, 3]) != 0
+                icon.pixel_array[:, :, 3] = int(255 * alpha) * alpha_mask
                 square = Group(square, icon)
             square.shift(i * DOWN + j * RIGHT)
             board.append(square)
