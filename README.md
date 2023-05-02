@@ -5,7 +5,7 @@ Uses the [cburnett piece-set](https://github.com/lichess-org/lila/tree/master/pu
 
 ## Usage
 ```python
-# From example.py
+# From examples/basic_example.py
 from manim import *
 from chess import get_board
 
@@ -20,3 +20,5 @@ Then, run in command-prompt (given a valid install of Manim)
 manim -pqh example.py
 ```
 ![Output from script](example.png)
+
+Other examples can be found in [/examples](/examples).
