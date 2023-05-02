@@ -41,9 +41,11 @@ def read_fen(fen):
     return rows, dims
 
 
-def get_board(fen, arrows=None, piece_opacities=None):
+def get_board(fen, arrows=None, piece_opacities=None, highlights=None):
     if arrows is None:
         arrows = []
+    if highlights is None:
+        highlights = []
     fen, dims = read_fen(fen)
     if piece_opacities is None:
         piece_opacities = np.ones(dims, dtype=np.float32)
@@ -55,10 +57,14 @@ def get_board(fen, arrows=None, piece_opacities=None):
             square.set_fill(color, 1)
             if not fen[i][j].isspace():
                 icon = piece_to_icon(fen[i][j])
-                icon.fade((1 - piece_opacities[i, j]))
+                icon.fade((1 - piece_opacities[i, j])).set_z_index(square.get_z() + 1)
                 square = Group(square, icon)
             square.shift(i * DOWN + j * RIGHT)
             board.append(square)
+    highlights_to_add = []
+    for (i, j, color) in highlights:
+        highlight = Square(0.999, stroke_width=0, fill_color=color, fill_opacity=0.7).shift(i * DOWN + j * RIGHT)
+        highlights_to_add.append(highlight.set_z_index(icon.get_z() + 0.5))  
     
     arrows_to_add = []
     for arrow in arrows:
@@ -69,7 +75,7 @@ def get_board(fen, arrows=None, piece_opacities=None):
         arrows_to_add.append(group)
         
     
-    board = Group(*board, *arrows_to_add)
+    board = Group(*board, *arrows_to_add, *highlights_to_add)
     board.set_x(0)
     board.set_y(0)
     return board
