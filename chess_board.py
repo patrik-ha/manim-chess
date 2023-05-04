@@ -37,7 +37,7 @@ class ChessBoard(Mobject):
 
     def add_highlight(self, i, j, color):
         square = Square(0.999, stroke_width=0, fill_color=color, fill_opacity=0.7)
-        square.shift(DOWN * i + RIGHT * j)
+        square.move_to(self.squares[i][j])
         self.add(square)
         
     def set_piece_opacities(self, opacities: np.ndarray):
